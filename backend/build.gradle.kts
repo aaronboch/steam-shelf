@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    application
 }
 
 group = "org.example"
@@ -18,6 +19,10 @@ dependencies {
     implementation(libs.logback.classic)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test.host)
+}
+
+application {
+    mainClass = "com.example.MainKt"
 }
 
 kotlin {

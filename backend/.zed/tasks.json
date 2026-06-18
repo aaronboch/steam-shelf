@@ -1,0 +1,8 @@
+[
+  {
+    "label": "gradle clean build",
+    "command": "./gradlew clean build",
+    "cwd": "/home/aaron/projects/steam-shelf/backend",
+    "use_new_terminal": true
+  }
+]
