@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.module
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
@@ -9,10 +10,7 @@ class ServerTest {
 
     @Test
     fun `test root endpoint`() = testApplication {
-        // loads default configuration
-        configure()
-        // verify server root returns 200
+        application { module() }
         assertEquals(HttpStatusCode.OK, client.get("/").status)
     }
-
 }
