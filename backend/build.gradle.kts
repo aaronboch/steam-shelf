@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     application
 }
 
@@ -19,6 +20,7 @@ dependencies {
     implementation(libs.logback.classic)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test.host)
+    implementation(libs.jbcrypt)
 }
 
 application {
