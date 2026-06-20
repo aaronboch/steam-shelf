@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.routes.configureAuthRouting
 import com.example.routes.configureRouting
+import com.example.routes.configureUserRouting
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -30,6 +31,9 @@ fun Application.module() {
                 val userId = credential.payload.subject
                 if (userId != null) UserIdPrincipal(userId) else null
             }
+            challenge { defaultScheme, realm ->
+                call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Unauthorized"))
+            }
         }
     }
 
@@ -41,4 +45,5 @@ fun Application.module() {
 
     configureRouting()
     configureAuthRouting()
+    configureUserRouting()
 }

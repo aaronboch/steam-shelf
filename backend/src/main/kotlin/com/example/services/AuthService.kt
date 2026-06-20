@@ -4,19 +4,19 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.models.User
 import com.example.models.responses.AuthResponse
-import com.example.repositories.UserRepository
 import io.github.cdimascio.dotenv.dotenv
 import org.mindrot.jbcrypt.BCrypt
 import java.util.Date
 import com.example.models.RefreshToken
 import com.example.repositories.RefreshTokenRepository
+import com.example.repositories.UserRepository
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
-class AuthService(private val userRepo: UserRepository = UserRepository()) {
+class AuthService() {
     val refreshTokenRepo = RefreshTokenRepository()
     val dotenv = dotenv()
     val random = SecureRandom()
@@ -51,7 +51,8 @@ class AuthService(private val userRepo: UserRepository = UserRepository()) {
 
 
     fun register(name: String, email: String, password: String): AuthResponse {
-        if (userRepo.findByEmail(email) != null) throw IllegalArgumentException("Email already in use")
+        if (UserRepository.findByEmail(email) != null) throw IllegalArgumentException("Email already in use")
+        if (UserRepository.findByUsername(name) != null) throw IllegalArgumentException("Username already in use")
 
         val hash = hashPassword(password)
         val user = User(
@@ -60,7 +61,7 @@ class AuthService(private val userRepo: UserRepository = UserRepository()) {
             id = UUID.randomUUID(),
             steamId = null,
         )
-        userRepo.save(UserRepository.UserRow(user = user, hashedPassword = hash))
+        UserRepository.save(UserRepository.UserRow(user = user, hashedPassword = hash))
 
 
         return createAuthResponse(user)
@@ -68,9 +69,9 @@ class AuthService(private val userRepo: UserRepository = UserRepository()) {
 
     fun login(login: String, password: String): AuthResponse {
         val userRow = if (login.contains('@')) {
-            userRepo.findByEmail(login)
+            UserRepository.findByEmail(login)
         } else {
-            userRepo.findByUsername(login)
+            UserRepository.findByUsername(login)
         } ?: throw IllegalArgumentException("User not found")
 
         if (!verifyPassword(password, userRow.hashedPassword)) throw IllegalArgumentException("Passwords do not match")
@@ -87,7 +88,7 @@ class AuthService(private val userRepo: UserRepository = UserRepository()) {
         if (token.revoked) throw IllegalArgumentException("Refresh token revoked")
         if (token.expiresAt < Clock.System.now()) throw IllegalArgumentException("Refresh token expired")
         token.revoked = true
-        val userRow = userRepo.findById(token.userId) ?: throw IllegalArgumentException("User not found")
+        val userRow = UserRepository.findById(token.userId) ?: throw IllegalArgumentException("User not found")
         val user = userRow.user
 
         return createAuthResponse(user)

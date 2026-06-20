@@ -4,7 +4,7 @@ import com.example.models.User
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-class UserRepository {
+object UserRepository {
     private val users: ConcurrentHashMap<UUID, UserRow> = ConcurrentHashMap()
 
     data class UserRow(
