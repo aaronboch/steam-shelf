@@ -1,6 +1,7 @@
 package com.example.routes
 
 import com.example.models.requests.LoginRequest
+import com.example.models.requests.RefreshRequest
 import com.example.models.requests.RegisterRequest
 import com.example.services.AuthService
 import io.ktor.server.application.*
@@ -22,5 +23,12 @@ fun Application.configureAuthRouting() {
             val jwt = authService.register(req.name, req.email, req.password)
             call.respond(jwt)
         }
+        post("/auth/refresh"){
+            //check refresh token and send back new jwt if valid
+            val req = call.receive<RefreshRequest>()
+            val newAuth = authService.refresh(req.refreshToken, req.refreshTokenId)
+            call.respond(newAuth)
+        }
+
     }
 }

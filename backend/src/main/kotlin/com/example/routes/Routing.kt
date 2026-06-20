@@ -1,6 +1,7 @@
 package com.example.routes
 
 import io.ktor.server.application.*
+import io.ktor.server.auth.authenticate
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -8,6 +9,9 @@ fun Application.configureRouting() {
     routing {
         get("/") {
             call.respondText("Hello, World!")
+        }
+        authenticate ("auth-jwt") {
+            // routes that need jwt token
         }
     }
 }

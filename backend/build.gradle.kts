@@ -21,6 +21,11 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test.host)
     implementation(libs.jbcrypt)
+    implementation(libs.jwt)
+    implementation(libs.dotenv)
+    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.auth.jwt)
+    implementation(libs.ktor.server.status.pages)
 }
 
 application {
