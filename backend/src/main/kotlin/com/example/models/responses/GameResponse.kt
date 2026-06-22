@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class GameResponse(
     val appId: Int,
     val name: String,
-    val capsule: String?,
+    val capsule: String = "",
     val playtimeForever: Int,
     val playtime2weeks: Int,
     val playtimeWindowsForever: Int,

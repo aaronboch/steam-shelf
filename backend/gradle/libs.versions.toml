@@ -17,6 +17,7 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 ktor-server-auth = { module = "io.ktor:ktor-server-auth-jvm", version.ref = "ktor" }
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt-jvm", version.ref = "ktor" }
 ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
+ktor-client-cio = {module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "bcrypt" }
 jwt = { module = "com.auth0:java-jwt", version.ref = "java-jwt" }
 dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv_ver" }

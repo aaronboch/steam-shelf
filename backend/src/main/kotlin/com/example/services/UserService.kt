@@ -8,6 +8,9 @@ import com.example.repositories.UserGamesRepository
 import com.example.repositories.UserRepository
 import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 import java.net.URI
 import java.util.UUID
@@ -16,7 +19,8 @@ import kotlin.time.Clock
 class UserService(
     private val gamesRepository: GamesRepository = GamesRepository(),
     private val userGamesRepo: UserGamesRepository = UserGamesRepository(),
-    private val dotenv: Dotenv = dotenv()
+    private val dotenv: Dotenv = dotenv(),
+    private val httpClient: HttpClient = HttpClient()
 ) {
     fun setSteamId(userId: String, steamId: String) {
         val userRow =
@@ -30,15 +34,14 @@ class UserService(
         return userRow.user
     }
 
-    fun refreshGamesBySteamId(user: User, steamId: String): List<GameResponse> {
+    suspend fun refreshGamesBySteamId(user: User, steamId: String): List<GameResponse> {
         val apiKey = dotenv["STEAM_API_KEY"] ?: throw IllegalStateException("API key not set")
         val url =
             URI.create("https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$apiKey&steamid=$steamId&format=json&include_appinfo=true&include_played_free_games=true&include_free_sub=true&include_extended_appinfo=true") //
                 .toURL()
         val json = Json { ignoreUnknownKeys = true }
         try {
-            val response = url.openStream().bufferedReader().use { stream -> stream.readText() }
-
+            val response = httpClient.get(url).bodyAsText()
             val parsed = json.decodeFromString<SteamGamesResponse>(response)
             parsed.response.games.forEach { game ->
                 if (gamesRepository.findByAppId(game.appid) == null) {
