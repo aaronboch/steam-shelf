@@ -27,7 +27,7 @@ class AuthService() {
             .withSubject(user.id.toString())
             .withClaim("name", user.name)
             .withClaim("email", user.email)
-            .withClaim("steamId", user.steamId.toString())
+            .withClaim("steamId", user.steamId ?: "")
             .withIssuedAt(Date())
             .withExpiresAt(Date(System.currentTimeMillis() + 3600_000)) // 1 hour
             .sign(Algorithm.HMAC256(secret))
