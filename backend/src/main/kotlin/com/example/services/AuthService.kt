@@ -10,16 +10,15 @@ import java.util.Date
 import com.example.models.RefreshToken
 import com.example.repositories.RefreshTokenRepository
 import com.example.repositories.UserRepository
+import io.github.cdimascio.dotenv.Dotenv
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
-class AuthService() {
-    val refreshTokenRepo = RefreshTokenRepository()
-    val dotenv = dotenv()
-    val random = SecureRandom()
+class AuthService(private val refreshTokenRepo: RefreshTokenRepository = RefreshTokenRepository(), private val dotenv: Dotenv = dotenv()) {
+    private val random = SecureRandom()
 
     fun createJwtToken(user: User): String {
         val secret = dotenv["JWT_SECRET"] ?: throw IllegalStateException("JWT_SECRET not set in .env")
