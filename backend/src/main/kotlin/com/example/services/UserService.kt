@@ -106,8 +106,15 @@ class UserService(
                 playtimeDisconnected = row.playtimeDisconnected,
                 lastFetched = row.lastFetched,
                 capsule = game.capsule,
-                priceCents = game.priceCents
+                priceCents = game.priceCents,
+                completed = row.completed
             )
         }
+    }
+
+
+
+    fun changeCompletion(appid: Int, userid: UUID, completion: Boolean) {
+        userGamesRepo.complete(userid, appid, completion)
     }
 }

@@ -17,4 +17,5 @@ data class GameResponse(
     val playtimeDisconnected: Int,
     val lastFetched: String,
     val priceCents: Int?,
+    val completed: Boolean,
 )

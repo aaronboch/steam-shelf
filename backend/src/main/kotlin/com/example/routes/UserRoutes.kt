@@ -1,8 +1,10 @@
 package com.example.routes
 
+import com.example.models.requests.CompletionRequest
 import com.example.models.requests.SteamIdRequest
 import com.example.models.responses.UserProfile
 import com.example.services.UserService
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
@@ -14,6 +16,7 @@ import io.ktor.server.routing.post
 
 import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
+import java.util.UUID
 
 
 fun Application.configureUserRouting() {
@@ -40,6 +43,14 @@ fun Application.configureUserRouting() {
                 val steamId = user.steamId ?: throw IllegalArgumentException("User has no steamId")
                 val games = userService.refreshGamesBySteamId(user, steamId)
                 call.respond(games)
+            }
+
+            put("/games/{appId}/completion") {
+                val userId = call.principal<UserIdPrincipal>()?.name ?: throw IllegalArgumentException("Not authenticated")
+                val appId = call.parameters["appId"] ?: throw IllegalArgumentException("Missing appId")
+                val req = call.receive<CompletionRequest>()
+                userService.changeCompletion(appId.toInt(),UUID.fromString(userId),req.completed)
+                call.respond(HttpStatusCode.OK)
             }
         }
         get("/users/{name}/games") {
