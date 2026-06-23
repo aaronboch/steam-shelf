@@ -37,9 +37,9 @@ fun Application.configureUserRouting() {
                 call.respond(mapOf("steamId" to req.steamId))
             }
 
-            post("/users/{name}/games/refresh") {
-                val name = call.parameters["name"] ?: throw IllegalArgumentException("Missing user name")
-                val user = userService.getUserByName(name) ?: throw IllegalArgumentException("User not found")
+            post("/games/refresh") {
+                val userId = call.principal<UserIdPrincipal>()?.name ?: throw IllegalArgumentException("Not authenticated")
+                val user = userService.getUserById(UUID.fromString(userId)) ?: throw IllegalArgumentException("User not found")
                 val steamId = user.steamId ?: throw IllegalArgumentException("User has no steamId")
                 val games = userService.refreshGamesBySteamId(user, steamId)
                 call.respond(games)

@@ -36,6 +36,11 @@ class UserService(
         return userRow.user
     }
 
+    fun getUserById(userId: UUID): User? {
+        val userRow = UserRepository.findById(userId) ?: return null
+        return userRow.user
+    }
+
     suspend fun refreshGamesBySteamId(user: User, steamId: String): List<GameResponse> {
         val apiKey = dotenv["STEAM_API_KEY"] ?: throw IllegalStateException("API key not set")
         val url =
