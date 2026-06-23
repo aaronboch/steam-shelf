@@ -16,4 +16,5 @@ data class GameResponse(
     val timeLastPlayed: Int,
     val playtimeDisconnected: Int,
     val lastFetched: String,
+    val priceCents: Int?,
 )
