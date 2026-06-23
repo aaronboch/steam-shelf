@@ -12,6 +12,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import java.net.URI
 import java.util.UUID
 import kotlin.time.Clock
@@ -43,9 +44,13 @@ class UserService(
         try {
             val response = httpClient.get(url).bodyAsText()
             val parsed = json.decodeFromString<SteamGamesResponse>(response)
+            val gameGetPriceList: MutableList<Int> = mutableListOf()
             parsed.response.games.forEach { game ->
                 if (gamesRepository.findByAppId(game.appid) == null) {
                     gamesRepository.save(GamesRepository.GamesRow(game.appid, game.name, game.capsuleFilename))
+                    gameGetPriceList.add(game.appid)
+                } else if (gamesRepository.findByAppId(game.appid)?.priceCents == null) {
+                    gameGetPriceList.add(game.appid)
                 }
                 userGamesRepo.save(
                     UserGamesRepository.UserGamesRow(
@@ -62,6 +67,18 @@ class UserService(
                         lastFetched = Clock.System.now().toString()
                     )
                 )
+            }
+            if (gameGetPriceList.isNotEmpty()) {
+                val priceUrl =
+                    URI.create("https://store.steampowered.com/api/appdetails?appids=${gameGetPriceList.joinToString(",")}&cc=de&filters=price_overview")
+                        .toURL()
+                val priceResponse = httpClient.get(priceUrl).bodyAsText()
+                val priceParsed = json.parseToJsonElement(priceResponse).jsonObject
+                priceParsed.forEach { (appId, appData) ->
+                    val priceOverview = appData.jsonObject["data"]?.jsonObject?.get("price_overview")?.jsonObject
+                    val priceCents = priceOverview?.get("final")?.toString()?.toIntOrNull()
+                    gamesRepository.addPrice(appId.toInt(), priceCents)
+                }
             }
             return getGamesResponsesByUserId(user.id)
         } catch (e: Exception) {
